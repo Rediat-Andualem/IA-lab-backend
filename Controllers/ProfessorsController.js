@@ -3,9 +3,208 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 
+// const createProfessorProfile = async (req, res) => {
+//   const { firstName, lastName, email, labName, password, labRoomNumber } = req.body;
+
+//   const validateField = (value, errorMessage, regex = null) => {
+//     if (!value) {
+//       res.status(400).json({ error: errorMessage });
+//       return false; // Stop execution
+//     }
+//     if (regex && !regex.test(value)) {
+//       res.status(400).json({ error: errorMessage });
+//       return false; // Stop execution
+//     }
+//     return true;
+//   };
+
+//   const trimmedFirstName = firstName ? firstName.trim() : "";
+//   const trimmedLastName = lastName ? lastName.trim() : "";
+//   const trimmedEmail = email ? email.trim() : "";
+//   const trimmedLabName = labName ? labName.trim() : "";
+//   const trimmedLabRoomNumber = labRoomNumber ? labRoomNumber.trim() : "";
+//   const trimmedPassword = password ? password.trim() : "";
+
+//   // Check for missing required fields
+//   if (!trimmedFirstName || !trimmedLastName || !trimmedEmail || !trimmedPassword) {
+//     return res.status(400).json({
+//       error: "All required fields (firstName, lastName, email) must be provided.",
+//     });
+//   }
+
+//   if (
+//     !validateField(
+//       trimmedFirstName,
+//       "Last name must contain only letters.",
+//        /^[A-Za-z]+$/
+//     )
+//   ) return;
+
+//   if (
+//     !validateField(
+//       trimmedLastName,
+//       "Last name must contain only letters.",
+//       /^[A-Za-z]+$/
+//     )
+//   ) return;
+
+//   if (
+//     !validateField(
+//       trimmedEmail,
+//       'Email must be a valid IITR email address ending with "iitr.ac.in". Example: "name_t@ch.iitr.ac.in".',
+//       /^[^\s@]+@.*\.iitr\.ac\.in$/
+//     )
+//   ) return;
+
+//   if (
+//     trimmedLabName &&
+//     !validateField(
+//       trimmedLabName,
+//       "Lab name must only include letters, numbers, and spaces. Example: 'Advanced Research Lab'.",
+//       /^[A-Za-z0-9 ]+$/
+//     )
+//   ) return;
+
+//   if (
+//     trimmedLabRoomNumber &&
+//     !validateField(
+//       trimmedLabRoomNumber,
+//       "Lab room number must contain only letters, numbers, and hyphens. Example: 'B-304'.",
+//       /^[A-Za-z0-9-]+$/
+//     )
+//   ) return;
+
+//   if (
+//     trimmedPassword &&
+//     !validateField(
+//       trimmedPassword,
+//       "Password must be at least 6 characters long and include one uppercase letter, one lowercase letter, one number, and one special character.",
+//       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{6,}$/
+//     )
+//   ) return;
+
+//   // Hash the password
+//   const salt = await bcrypt.genSalt(10);
+//   const hashPassword = await bcrypt.hash(trimmedPassword, salt);
+
+//   try {
+//     // Create the professor record
+//     const professor = await Professor.create({
+//       firstName: `Dr.${trimmedFirstName} `,
+//       lastName: trimmedLastName,
+//       email: trimmedEmail.toLowerCase(),
+//       labName: trimmedLabName || null,
+//       labRoomNumber: trimmedLabRoomNumber || null,
+//       password: hashPassword,
+//     });
+
+//     // Send email asynchronously
+//     const sendEmail = async () => {
+//       let mailSender = nodemailer.createTransport({
+//         service: "gmail",
+//         port: 465,
+//         auth: {
+//           user: process.env.EMAIL_USER,
+//           pass: process.env.EMAIL_PASS,
+//         },
+//       });
+
+//       const details = {
+//         from: process.env.EMAIL_USER,
+//         to: professor.email,
+//         subject: "Credentials for accessing IA lab professors portal",
+//         html: `
+//           <html>
+//           <head>
+//            <style>
+//               body {
+//                   font-family: Arial, sans-serif;
+//                   background-color: #f6f6f6;
+//                   margin: 0;
+//                   padding: 0;
+//               }
+//               .container {
+//                   max-width: 600px;
+//                   margin: 0 auto;
+//                   background-color: #ffffff;
+//                   padding: 20px;
+//                   border-radius: 8px;
+//                   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+//                   border: 1px solid #cccccc;
+//               }
+//               .header {
+//                   text-align: center;
+//                   padding: 10px 0;
+//               }
+//               .content {
+//                   text-align: center;
+//                   padding: 20px;
+//               }
+//               .cta-button {
+//                   display: inline-block;
+//                   padding: 15px 25px;
+//                   margin: 20px 0;
+//                   background-color: #FF8318;
+//                   color: #ffffff;
+//                   font-weight: bold;
+//                   text-decoration: none;
+//                   border-radius: 5px;
+//                   text-align: center;
+//               }
+//               .footer {
+//                   text-align: center;
+//                   padding: 10px 0;
+//                   font-size: 12px;
+//                   color: #777777;
+//               }
+//           </style></head>
+//           <body>
+//              <div class="container">
+//               <div class="header">
+//                   <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+//                       <rect width="100" height="100" fill="#007BFF"/>
+//                       <h1>IA Lab.</h1>
+//                   </svg>
+//               </div>
+//               <div class="content">
+//                    <h3>Credentials to access IA lab Professor's portal</h3>
+//                   <h5>Make sure to update your password using the forgot password option up on login</h5>
+//                 <p> <b>Email</b>: ${email}</p>
+//             <p> <b>Password</b>: ${password}</p>
+//               </div>
+//               <div class="footer">
+//                   <p>If you did not sign up for this account, please ignore this email.</p>
+//               </div>
+//           </div>
+//           </body>
+        
+//       </body>
+//           </html>
+//         `,
+//       };
+
+//       try {
+//         await mailSender.sendMail(details);
+//         console.log("Email sent to:", professor.email);
+//       } catch (err) {
+//         console.log("Error sending email:", err);
+//         throw new Error("Error sending email");
+//       }
+//     };
+
+//     // Call sendEmail
+//     await sendEmail();
+
+//     // Send success response after email is sent
+//     return res.status(201).json({ message: "Professor profile created successfully", professor });
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(500).json({ errors: [err.message] });
+//   }
+// };
 const createProfessorProfile = async (req, res) => {
   const { firstName, lastName, email, labName, password, labRoomNumber } = req.body;
-
+console.log(firstName, lastName, email, labName, password, labRoomNumber )
   const validateField = (value, errorMessage, regex = null) => {
     if (!value) {
       res.status(400).json({ error: errorMessage });
@@ -89,120 +288,127 @@ const createProfessorProfile = async (req, res) => {
 
   try {
     // Create the professor record
-    const professor = await Professor.create({
-      firstName: `Dr.${trimmedFirstName} `,
-      lastName: trimmedLastName,
-      email: trimmedEmail.toLowerCase(),
-      labName: trimmedLabName || null,
-      labRoomNumber: trimmedLabRoomNumber || null,
-      password: hashPassword,
-    });
-
-    // Send email asynchronously
-    const sendEmail = async () => {
-      let mailSender = nodemailer.createTransport({
-        service: "gmail",
-        port: 465,
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
+    const emailTrimmed = trimmedEmail.toLowerCase()
+    const testUserEXistance = User.findOne(emailTrimmed)
+    console.log(testUserEXistance)
+    if(!testUserEXistance){
+      const professor = await Professor.create({
+        firstName: `Dr.${trimmedFirstName} `,
+        lastName: trimmedLastName,
+        email:emailTrimmed ,
+        labName: trimmedLabName || null,
+        labRoomNumber: trimmedLabRoomNumber || null,
+        password: hashPassword,
       });
-
-      const details = {
-        from: process.env.EMAIL_USER,
-        to: professor.email,
-        subject: "Credentials for accessing IA lab professors portal",
-        html: `
-          <html>
-          <head>
-           <style>
-              body {
-                  font-family: Arial, sans-serif;
-                  background-color: #f6f6f6;
-                  margin: 0;
-                  padding: 0;
-              }
-              .container {
-                  max-width: 600px;
-                  margin: 0 auto;
-                  background-color: #ffffff;
-                  padding: 20px;
-                  border-radius: 8px;
-                  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                  border: 1px solid #cccccc;
-              }
-              .header {
-                  text-align: center;
-                  padding: 10px 0;
-              }
-              .content {
-                  text-align: center;
-                  padding: 20px;
-              }
-              .cta-button {
-                  display: inline-block;
-                  padding: 15px 25px;
-                  margin: 20px 0;
-                  background-color: #FF8318;
-                  color: #ffffff;
-                  font-weight: bold;
-                  text-decoration: none;
-                  border-radius: 5px;
-                  text-align: center;
-              }
-              .footer {
-                  text-align: center;
-                  padding: 10px 0;
-                  font-size: 12px;
-                  color: #777777;
-              }
-          </style></head>
-          <body>
-             <div class="container">
-              <div class="header">
-                  <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
-                      <rect width="100" height="100" fill="#007BFF"/>
-                      <h1>IA Lab.</h1>
-                  </svg>
-              </div>
-              <div class="content">
-                   <h3>Credentials to access IA lab Professor's portal</h3>
-                  <h5>Make sure to update your password using the forgot password option up on login</h5>
-                <p> <b>Email</b>: ${email}</p>
-            <p> <b>Password</b>: ${password}</p>
-              </div>
-              <div class="footer">
-                  <p>If you did not sign up for this account, please ignore this email.</p>
-              </div>
-          </div>
-          </body>
-        
-      </body>
-          </html>
-        `,
+  
+      // Send email asynchronously
+      const sendEmail = async () => {
+        let mailSender = nodemailer.createTransport({
+          service: "gmail",
+          port: 465,
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+          },
+        });
+  
+        const details = {
+          from: process.env.EMAIL_USER,
+          to: professor.email,
+          subject: "Credentials for accessing IA lab professors portal",
+          html: `
+            <html>
+            <head>
+             <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    background-color: #f6f6f6;
+                    margin: 0;
+                    padding: 0;
+                }
+                .container {
+                    max-width: 600px;
+                    margin: 0 auto;
+                    background-color: #ffffff;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                    border: 1px solid #cccccc;
+                }
+                .header {
+                    text-align: center;
+                    padding: 10px 0;
+                }
+                .content {
+                    text-align: center;
+                    padding: 20px;
+                }
+                .cta-button {
+                    display: inline-block;
+                    padding: 15px 25px;
+                    margin: 20px 0;
+                    background-color: #FF8318;
+                    color: #ffffff;
+                    font-weight: bold;
+                    text-decoration: none;
+                    border-radius: 5px;
+                    text-align: center;
+                }
+                .footer {
+                    text-align: center;
+                    padding: 10px 0;
+                    font-size: 12px;
+                    color: #777777;
+                }
+            </style></head>
+            <body>
+               <div class="container">
+                <div class="header">
+                    <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100" height="100" fill="#007BFF"/>
+                        <h1>IA Lab.</h1>
+                    </svg>
+                </div>
+                <div class="content">
+                     <h3>Credentials to access IA lab Professor's portal</h3>
+                    <h5>Make sure to update your password using the forgot password option up on login</h5>
+                  <p> <b>Email</b>: ${email}</p>
+              <p> <b>Password</b>: ${password}</p>
+                </div>
+                <div class="footer">
+                    <p>If you did not sign up for this account, please ignore this email.</p>
+                </div>
+            </div>
+            </body>
+          
+        </body>
+            </html>
+          `,
+        };
+  
+        try {
+          await mailSender.sendMail(details);
+          console.log("Email sent to:", professor.email);
+        } catch (err) {
+          console.log("Error sending email:", err);
+          throw new Error("Error sending email");
+        }
       };
+  
+      // Call sendEmail
+      await sendEmail();
+  
+      // Send success response after email is sent
+      return res.status(201).json({ message: "Professor profile created successfully", professor });
+    }else{
+      return res.status(400).json({ errors: "Professor profile already exist"});
+    }
 
-      try {
-        await mailSender.sendMail(details);
-        console.log("Email sent to:", professor.email);
-      } catch (err) {
-        console.log("Error sending email:", err);
-        throw new Error("Error sending email");
-      }
-    };
-
-    // Call sendEmail
-    await sendEmail();
-
-    // Send success response after email is sent
-    return res.status(201).json({ message: "Professor profile created successfully", professor });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ errors: [err.message] });
   }
 };
-
 const allProfessorsFinder = async (req, res) => {
     try {
       // Fetch all users from the database, excluding sensitive fields like password
