@@ -495,7 +495,8 @@ const ProfessorLogin = async (req, res) => {
         userId: user.professorId	,
         userName: user.firstName,
         userEmail:user.email,
-        userRole : "5"
+        userRole : "5",
+        verification : user.verification
       },
       process.env.JWT_SECRET_KEY,
       { expiresIn: "3d" }
