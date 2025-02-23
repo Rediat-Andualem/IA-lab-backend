@@ -957,7 +957,7 @@ if (!emailRegex.test(trimmedEmail)) {
     });
  let guideEmailAddress = guideEmail.email
 // Create a password reset link
-const resetLink = `${process.env.FRONTEND_URL}studentConfirmation/${user.userId}`
+const resetLink = `${process.env.FRONTEND_URL}/studentConfirmation/${user.userId}`
 
 
 // Send email asynchronously
@@ -1423,7 +1423,7 @@ const userPasswordResetRequest = async (req, res) => {
     }
 
     // Create a password reset link
-    const resetLink = `http://${process.env.FRONTEND_URL}/userPasswordReset/${user.userId}`
+    const resetLink = `${process.env.FRONTEND_URL}/userPasswordReset/${user.userId}`
 
 
     // Send email asynchronously
