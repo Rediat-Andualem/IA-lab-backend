@@ -288,9 +288,12 @@ console.log(firstName, lastName, email, labName, password, labRoomNumber )
 
   try {
     // Create the professor record
-    const emailTrimmed = trimmedEmail.toLowerCase()
-    const testUserEXistance = Professor.findOne(emailTrimmed)
-    if(!testUserEXistance){
+    const emailTrimmed = email.trim().toLowerCase()
+    const guideEmail = await Professor.findOne({
+      where: { email: emailTrimmed },
+    });
+  let professorEmail = guideEmail?.email || ""
+    if(!professorEmail){
       const professor = await Professor.create({
         firstName: `Dr.${trimmedFirstName} `,
         lastName: trimmedLastName,

@@ -936,8 +936,11 @@ if (!emailRegex.test(trimmedEmail)) {
 
     // Create the user
     const emailTrimmed = email.trim().toLowerCase()
-    const testUserEXistance = User.findOne(emailTrimmed)
-     if(!testUserEXistance){
+    const userEmail = await User.findOne({
+      where: { email: emailTrimmed },
+    });
+  let userEmailChecker = userEmail?.email || ""
+     if(!userEmailChecker){
       const user = await User.create({
         firstName: firstName.trim(),
         lastName: lastName.trim(),
