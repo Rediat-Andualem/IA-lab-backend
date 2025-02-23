@@ -289,8 +289,7 @@ console.log(firstName, lastName, email, labName, password, labRoomNumber )
   try {
     // Create the professor record
     const emailTrimmed = trimmedEmail.toLowerCase()
-    const testUserEXistance = User.findOne(emailTrimmed)
-    console.log(testUserEXistance)
+    const testUserEXistance = Professor.findOne(emailTrimmed)
     if(!testUserEXistance){
       const professor = await Professor.create({
         firstName: `Dr.${trimmedFirstName} `,
