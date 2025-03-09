@@ -3,325 +3,116 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 
-// const createProfessorProfile = async (req, res) => {
-//   const { firstName, lastName, email, labName, password, labRoomNumber } = req.body;
 
-//   const validateField = (value, errorMessage, regex = null) => {
-//     if (!value) {
-//       res.status(400).json({ error: errorMessage });
-//       return false; // Stop execution
-//     }
-//     if (regex && !regex.test(value)) {
-//       res.status(400).json({ error: errorMessage });
-//       return false; // Stop execution
-//     }
-//     return true;
-//   };
-
-//   const trimmedFirstName = firstName ? firstName.trim() : "";
-//   const trimmedLastName = lastName ? lastName.trim() : "";
-//   const trimmedEmail = email ? email.trim() : "";
-//   const trimmedLabName = labName ? labName.trim() : "";
-//   const trimmedLabRoomNumber = labRoomNumber ? labRoomNumber.trim() : "";
-//   const trimmedPassword = password ? password.trim() : "";
-
-//   // Check for missing required fields
-//   if (!trimmedFirstName || !trimmedLastName || !trimmedEmail || !trimmedPassword) {
-//     return res.status(400).json({
-//       error: "All required fields (firstName, lastName, email) must be provided.",
-//     });
-//   }
-
-//   if (
-//     !validateField(
-//       trimmedFirstName,
-//       "Last name must contain only letters.",
-//        /^[A-Za-z]+$/
-//     )
-//   ) return;
-
-//   if (
-//     !validateField(
-//       trimmedLastName,
-//       "Last name must contain only letters.",
-//       /^[A-Za-z]+$/
-//     )
-//   ) return;
-
-//   if (
-//     !validateField(
-//       trimmedEmail,
-//       'Email must be a valid IITR email address ending with "iitr.ac.in". Example: "name_t@ch.iitr.ac.in".',
-//       /^[^\s@]+@.*\.iitr\.ac\.in$/
-//     )
-//   ) return;
-
-//   if (
-//     trimmedLabName &&
-//     !validateField(
-//       trimmedLabName,
-//       "Lab name must only include letters, numbers, and spaces. Example: 'Advanced Research Lab'.",
-//       /^[A-Za-z0-9 ]+$/
-//     )
-//   ) return;
-
-//   if (
-//     trimmedLabRoomNumber &&
-//     !validateField(
-//       trimmedLabRoomNumber,
-//       "Lab room number must contain only letters, numbers, and hyphens. Example: 'B-304'.",
-//       /^[A-Za-z0-9-]+$/
-//     )
-//   ) return;
-
-//   if (
-//     trimmedPassword &&
-//     !validateField(
-//       trimmedPassword,
-//       "Password must be at least 6 characters long and include one uppercase letter, one lowercase letter, one number, and one special character.",
-//       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{6,}$/
-//     )
-//   ) return;
-
-//   // Hash the password
-//   const salt = await bcrypt.genSalt(10);
-//   const hashPassword = await bcrypt.hash(trimmedPassword, salt);
-
-//   try {
-//     // Create the professor record
-//     const professor = await Professor.create({
-//       firstName: `Dr.${trimmedFirstName} `,
-//       lastName: trimmedLastName,
-//       email: trimmedEmail.toLowerCase(),
-//       labName: trimmedLabName || null,
-//       labRoomNumber: trimmedLabRoomNumber || null,
-//       password: hashPassword,
-//     });
-
-//     // Send email asynchronously
-//     const sendEmail = async () => {
-//       let mailSender = nodemailer.createTransport({
-//         service: "gmail",
-//         port: 465,
-//         auth: {
-//           user: process.env.EMAIL_USER,
-//           pass: process.env.EMAIL_PASS,
-//         },
-//       });
-
-//       const details = {
-//         from: process.env.EMAIL_USER,
-//         to: professor.email,
-//         subject: "Credentials for accessing IA lab professors portal",
-//         html: `
-//           <html>
-//           <head>
-//            <style>
-//               body {
-//                   font-family: Arial, sans-serif;
-//                   background-color: #f6f6f6;
-//                   margin: 0;
-//                   padding: 0;
-//               }
-//               .container {
-//                   max-width: 600px;
-//                   margin: 0 auto;
-//                   background-color: #ffffff;
-//                   padding: 20px;
-//                   border-radius: 8px;
-//                   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-//                   border: 1px solid #cccccc;
-//               }
-//               .header {
-//                   text-align: center;
-//                   padding: 10px 0;
-//               }
-//               .content {
-//                   text-align: center;
-//                   padding: 20px;
-//               }
-//               .cta-button {
-//                   display: inline-block;
-//                   padding: 15px 25px;
-//                   margin: 20px 0;
-//                   background-color: #FF8318;
-//                   color: #ffffff;
-//                   font-weight: bold;
-//                   text-decoration: none;
-//                   border-radius: 5px;
-//                   text-align: center;
-//               }
-//               .footer {
-//                   text-align: center;
-//                   padding: 10px 0;
-//                   font-size: 12px;
-//                   color: #777777;
-//               }
-//           </style></head>
-//           <body>
-//              <div class="container">
-//               <div class="header">
-//                   <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
-//                       <rect width="100" height="100" fill="#007BFF"/>
-//                       <h1>IA Lab.</h1>
-//                   </svg>
-//               </div>
-//               <div class="content">
-//                    <h3>Credentials to access IA lab Professor's portal</h3>
-//                   <h5>Make sure to update your password using the forgot password option up on login</h5>
-//                 <p> <b>Email</b>: ${email}</p>
-//             <p> <b>Password</b>: ${password}</p>
-//               </div>
-//               <div class="footer">
-//                   <p>If you did not sign up for this account, please ignore this email.</p>
-//               </div>
-//           </div>
-//           </body>
-        
-//       </body>
-//           </html>
-//         `,
-//       };
-
-//       try {
-//         await mailSender.sendMail(details);
-//         console.log("Email sent to:", professor.email);
-//       } catch (err) {
-//         console.log("Error sending email:", err);
-//         throw new Error("Error sending email");
-//       }
-//     };
-
-//     // Call sendEmail
-//     await sendEmail();
-
-//     // Send success response after email is sent
-//     return res.status(201).json({ message: "Professor profile created successfully", professor });
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).json({ errors: [err.message] });
-//   }
-// };
-const createProfessorProfile = async (req, res) => {
-  const { firstName, lastName, email, labName, password, labRoomNumber } = req.body;
-console.log(firstName, lastName, email, labName, password, labRoomNumber )
-  const validateField = (value, errorMessage, regex = null) => {
-    if (!value) {
-      res.status(400).json({ error: errorMessage });
-      return false; // Stop execution
-    }
-    if (regex && !regex.test(value)) {
-      res.status(400).json({ error: errorMessage });
-      return false; // Stop execution
-    }
-    return true;
-  };
-
-  const trimmedFirstName = firstName ? firstName.trim() : "";
-  const trimmedLastName = lastName ? lastName.trim() : "";
-  const trimmedEmail = email ? email.trim() : "";
-  const trimmedLabName = labName ? labName.trim() : "";
-  const trimmedLabRoomNumber = labRoomNumber ? labRoomNumber.trim() : "";
-  const trimmedPassword = password ? password.trim() : "";
-
-  // Check for missing required fields
-  if (!trimmedFirstName || !trimmedLastName || !trimmedEmail || !trimmedPassword) {
-    return res.status(400).json({
-      error: "All required fields (firstName, lastName, email) must be provided.",
-    });
-  }
-
-  if (
-    !validateField(
-      trimmedFirstName,
-      "Last name must contain only letters.",
-       /^[A-Za-z]+$/
-    )
-  ) return;
-
-  if (
-    !validateField(
-      trimmedLastName,
-      "Last name must contain only letters.",
-      /^[A-Za-z]+$/
-    )
-  ) return;
-
-  if (
-    !validateField(
-      trimmedEmail,
-      'Email must be a valid IITR email address ending with "iitr.ac.in". Example: "name_t@ch.iitr.ac.in".',
-      /^[^\s@]+@.*\.iitr\.ac\.in$/
-    )
-  ) return;
-
-  if (
-    trimmedLabName &&
-    !validateField(
-      trimmedLabName,
-      "Lab name must only include letters, numbers, and spaces. Example: 'Advanced Research Lab'.",
-      /^[A-Za-z0-9 ]+$/
-    )
-  ) return;
-
-  if (
-    trimmedLabRoomNumber &&
-    !validateField(
-      trimmedLabRoomNumber,
-      "Lab room number must contain only letters, numbers, and hyphens. Example: 'B-304'.",
-      /^[A-Za-z0-9-]+$/
-    )
-  ) return;
-
-  if (
-    trimmedPassword &&
-    !validateField(
-      trimmedPassword,
-      "Password must be at least 6 characters long and include one uppercase letter, one lowercase letter, one number, and one special character.",
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{6,}$/
-    )
-  ) return;
-
-  // Hash the password
-  const salt = await bcrypt.genSalt(10);
-  const hashPassword = await bcrypt.hash(trimmedPassword, salt);
-
+const sendEmail = async (email, password) => {
   try {
-    // Create the professor record
-    const emailTrimmed = email.trim().toLowerCase()
-    const guideEmail = await Professor.findOne({
-      where: { email: emailTrimmed },
+    let mailSender = nodemailer.createTransport({
+      service: "gmail",
+      port: 465,
+      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
     });
-  let professorEmail = guideEmail?.email || ""
-    if(!professorEmail){
-      const professor = await Professor.create({
-        firstName: `Dr.${trimmedFirstName} `,
-        lastName: trimmedLastName,
-        email:emailTrimmed ,
-        labName: trimmedLabName || null,
-        labRoomNumber: trimmedLabRoomNumber || null,
-        password: hashPassword,
-      });
-  
-      // Send email asynchronously
-      const sendEmail = async () => {
-        let mailSender = nodemailer.createTransport({
-          service: "gmail",
-          port: 465,
-          auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-          },
-        });
-  
-        const details = {
-          from: process.env.EMAIL_USER,
-          to: professor.email,
-          subject: "Credentials for accessing IA lab professors portal",
-          html: `
-            <html>
-            <head>
-             <style>
+
+    const details = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Credentials for accessing IA lab professors portal",
+      html: `
+        <html>
+        <head>
+          <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f6f6f6;
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #ffffff;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                border: 1px solid #cccccc;
+            }
+            .header {
+                text-align: center;
+                padding: 10px 0;
+            }
+            .content {
+                text-align: center;
+                padding: 20px;
+            }
+            .cta-button {
+                display: inline-block;
+                padding: 15px 25px;
+                margin: 20px 0;
+                background-color: #FF8318;
+                color: #ffffff;
+                font-weight: bold;
+                text-decoration: none;
+                border-radius: 5px;
+                text-align: center;
+            }
+            .footer {
+                text-align: center;
+                padding: 10px 0;
+                font-size: 12px;
+                color: #777777;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100" height="100" fill="#007BFF"/>
+                <h1>IA Lab.</h1>
+              </svg>
+            </div>
+            <div class="content">
+              <h3>Credentials to access IA lab Professor's portal</h3>
+              <h5>Make sure to update your password using the forgot password option upon login</h5>
+              <p><b>Email</b>: ${email}</p>
+              <p><b>Password</b>: ${password}</p>
+            </div>
+            <div class="footer">
+              <p>If you did not sign up for this account, please ignore this email.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `,
+    };
+
+    await mailSender.sendMail(details);
+    console.log("Email sent successfully to:", email);
+    
+  } catch (err) {
+    console.error("Error sending email:", err);
+  }
+};
+
+const sendEmailResetForProfessor = async (email, resetLink) => {
+  try {
+    let mailSender = nodemailer.createTransport({
+      service: "gmail",
+      port: 465,
+      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+    });
+
+    const details = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Password Reset Request For Professors",
+      html: `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Update Password</title>
+            <style>
                 body {
                     font-family: Arial, sans-serif;
                     background-color: #f6f6f6;
@@ -362,9 +153,10 @@ console.log(firstName, lastName, email, labName, password, labRoomNumber )
                     font-size: 12px;
                     color: #777777;
                 }
-            </style></head>
-            <body>
-               <div class="container">
+            </style>
+        </head>
+        <body>
+            <div class="container">
                 <div class="header">
                     <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
                         <rect width="100" height="100" fill="#007BFF"/>
@@ -372,64 +164,99 @@ console.log(firstName, lastName, email, labName, password, labRoomNumber )
                     </svg>
                 </div>
                 <div class="content">
-                     <h3>Credentials to access IA lab Professor's portal</h3>
-                    <h5>Make sure to update your password using the forgot password option up on login</h5>
-                  <p> <b>Email</b>: ${email}</p>
-              <p> <b>Password</b>: ${password}</p>
+                    <h3>Update your password</h3>
+                    <h5>Click the button below to update the password which was provided to you from the admin section</h5>
+                    
+                    <a href="${resetLink}" class="cta-button">Update Password</a>
                 </div>
                 <div class="footer">
                     <p>If you did not sign up for this account, please ignore this email.</p>
                 </div>
             </div>
-            </body>
-          
         </body>
-            </html>
-          `,
-        };
-  
-        try {
-          await mailSender.sendMail(details);
-          console.log("Email sent to:", professor.email);
-        } catch (err) {
-          console.log("Error sending email:", err);
-          throw new Error("Error sending email");
-        }
-      };
-  
-      // Call sendEmail
-      await sendEmail();
-  
-      // Send success response after email is sent
-      return res.status(201).json({ message: "Professor profile created successfully", professor });
-    }else{
-      return res.status(400).json({ errors: "Professor profile already exist"});
-    }
+        </html>
+      `,
+    };
 
+    await mailSender.sendMail(details);
+    console.log("Password reset email sent successfully to:", email);
+    
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ errors: [err.message] });
+    console.error("Error sending email:", err);
   }
 };
+
+const createProfessorProfile = async (req, res) => {
+  try {
+    const { firstName, lastName, email, labName, password, labRoomNumber } = req.body;
+
+    // Trim inputs
+    const trimmedFirstName = firstName?.trim() || "";
+    const trimmedLastName = lastName?.trim() || "";
+    const trimmedEmail = email?.trim().toLowerCase() || "";
+    const trimmedLabName = labName?.trim() || "";
+    const trimmedLabRoomNumber = labRoomNumber?.trim() || "";
+    const trimmedPassword = password?.trim() || "";
+
+    // Validate fields
+    const errors = [];
+    if (!trimmedFirstName || !trimmedLastName || !trimmedEmail || !trimmedPassword) 
+      errors.push("Required fields: firstName, lastName, email, password.");
+
+    if (!/^[A-Za-z]+$/.test(trimmedFirstName)) errors.push("First name must contain only letters.");
+    if (!/^[A-Za-z]+$/.test(trimmedLastName)) errors.push("Last name must contain only letters.");
+    if (!/^[^\s@]+@.*\.iitr\.ac\.in$/.test(trimmedEmail)) errors.push("Invalid IITR email address.");
+    if (trimmedLabName && !/^[A-Za-z0-9 ]+$/.test(trimmedLabName)) errors.push("Invalid lab name.");
+    if (trimmedLabRoomNumber && !/^[A-Za-z0-9-]+$/.test(trimmedLabRoomNumber)) errors.push("Invalid lab room number.");
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{6,}$/.test(trimmedPassword)) 
+      errors.push("Weak password. Include uppercase, lowercase, number, and special char.");
+
+    if (errors.length > 0) return res.status(400).json({ errors });
+
+    // Hash password
+    const hashPassword = await bcrypt.hash(trimmedPassword, 10);
+    const lowerCasedEmail = trimmedEmail.toLowerCase()
+    // Find or create professor
+    const [professor, created] = await Professor.findOrCreate({
+      where: { email: lowerCasedEmail },
+      defaults: {
+        firstName: `Dr.${trimmedFirstName}`,
+        lastName: trimmedLastName,
+        labName: trimmedLabName || null,
+        labRoomNumber: trimmedLabRoomNumber || null,
+        password: hashPassword,
+      },
+    });
+
+    if (!created) return res.status(400).json({ error: "Professor profile already exists" });
+
+    // Send email asynchronously
+    sendEmail(professor.email, password).catch(console.error);
+
+    return res.status(201).json({ message: "Professor profile created successfully", professor });
+
+  } catch (err) {
+    console.error("Error in createProfessorProfile:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 const allProfessorsFinder = async (req, res) => {
-    try {
-      // Fetch all users from the database, excluding sensitive fields like password
-      const AllProfessors = await Professor.findAll();
-      // Respond with an empty array if no users are found, but still return 200 OK
-      if (AllProfessors.length === 0) {
-        return res.status(200).json({ message: ["No Professor list found."] });
-      }
-  
-      // Respond with the list of users
-      return res.status(200).json({ AllProfessors });
-    } catch (err) {
-      if (err.name === "ValidationErrorItem") {
-        const validationErrors = err.errors.map((e) => e.message);
-        return res.status(400).json({ errors: [validationErrors.message] });
-      }
-      return res.status(500).json({ errors: [err.message] });
-    }
-  };
+  try {
+    // Fetch all professors, excluding sensitive fields like password
+    const AllProfessors = await Professor.findAll({
+      attributes: { exclude: ["password"] }, // Ensure password is never exposed
+    });
+
+    // Return the result (empty array if no records found)
+    return res.status(200).json({ professors: AllProfessors });
+
+  } catch (err) {
+    console.error("Error in allProfessorsFinder:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 
 const deleteProfessor = async (req, res) => {
     const { professorId } = req.params;
@@ -458,45 +285,34 @@ const deleteProfessor = async (req, res) => {
   };
   
 const ProfessorLogin = async (req, res) => {
-  const { email, password } = req.body;
-
-  const errors = [];
-
-  // Trim input values
-  const trimmedEmail = email ? email.trim() : "";
-  const trimmedPassword = password ? password.trim() : "";
-
-  // Validation checks
-  if (!trimmedEmail) errors.push("Email is required.");
-  if (!trimmedPassword) errors.push("Password is required.");
-
-  // If there are validation errors, respond with the errors
-  if (errors.length > 0) {
-    return res.status(400).json({ errors });
-  }
-
   try {
+    const { email, password } = req.body;
+
+    // Validate input
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required." });
+    }
+
+    // Trim input values
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+
     // Find the user by email
     const user = await Professor.findOne({ where: { email: trimmedEmail } });
-    // Check if user exists
-    if (!user) {
-      return res.status(401).json({ errors: ["Invalid credentials"] });
+
+    // Always return "Invalid credentials" (Prevents email enumeration)
+    if (!user || !(await bcrypt.compare(trimmedPassword, user.password))) {
+      return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    // Check if the password matches
-    const isMatch = await bcrypt.compare(trimmedPassword, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ errors: ["Invalid credentials"] });
-    }
-    
     // Generate JWT token
     const token = jwt.sign(
       {
-        userId: user.professorId	,
+        userId: user.professorId,
         userName: user.firstName,
-        userEmail:user.email,
-        userRole : "5",
-        verification : user.verification
+        userEmail: user.email,
+        userRole: "5",
+        verification: user.verification,
       },
       process.env.JWT_SECRET_KEY,
       { expiresIn: "3d" }
@@ -505,241 +321,127 @@ const ProfessorLogin = async (req, res) => {
     // Send response with token
     res.setHeader("Authorization", `Bearer ${token}`);
     return res.status(200).json({
-      message: ["User logged in successfully"],
+      message: "User logged in successfully",
+      token, // Include token in response (optional)
     });
-  } catch (err) {
-    if (err.name === "ValidationErrorItem") {
-      const validationErrors = err.errors.map((e) => e.message);
-      return res.status(400).json({ errors: [validationErrors.message] });
-    }
 
-    return res.status(500).json({ errors: [err.message] });
+  } catch (err) {
+    console.error("Error in ProfessorLogin:", err);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
+
+
 const ProfessorResetRequest = async (req, res) => {
-  const { email } = req.body;
-  const errors = [];
-
-
-  // Validation checks
-  if (!email) {
-    errors.push("Email is required.");
-  }
-
-  // If there are validation errors, respond with the errors
-  if (errors.length > 0) {
-    return res.status(400).json({ errors });
-  }
-
   try {
-    // Find the user by email
+    const { email } = req.body;
+
+    // Validation
+    if (!email) {
+      return res.status(400).json({ error: "Email is required." });
+    }
+
+    // Find the professor (but don’t indicate existence in response)
     const user = await Professor.findOne({ where: { email } });
 
-    // Check if user exists
-    if (!user) {
-      return res
-        .status(404)
-        .json({ message: ["Update link has been sent to your email"] });
-    }
+    // Always return a generic response to prevent email enumeration
+    res.status(200).json({ message: "Reset link has been sent." });
 
-    // Create a password reset link
-    const resetLink = `http://${process.env.FRONTEND_URL}/ProfessorPasswordReset/${user.professorId}`
+    // If user doesn't exist, don't proceed further
+    if (!user) return;
 
+    // Create password reset link
+    const resetLink = `http://${process.env.FRONTEND_URL}/ProfessorPasswordReset/${user.professorId}`;
 
-    // Send email asynchronously
-    const sendEmail = async () => {
-      let mailSender = nodemailer.createTransport({
-        service: "gmail",
-        port: 465,
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
-      });
-
-      const details = {
-        from: process.env.EMAIL_USER,
-        to: user.email,
-        subject: "Password Reset Request For Professors",
-        html: `
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Update Password</title>
-              <style>
-                  body {
-                      font-family: Arial, sans-serif;
-                      background-color: #f6f6f6;
-                      margin: 0;
-                      padding: 0;
-                  }
-                  .container {
-                      max-width: 600px;
-                      margin: 0 auto;
-                      background-color: #ffffff;
-                      padding: 20px;
-                      border-radius: 8px;
-                      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                      border: 1px solid #cccccc;
-                  }
-                  .header {
-                      text-align: center;
-                      padding: 10px 0;
-                  }
-                  .content {
-                      text-align: center;
-                      padding: 20px;
-                  }
-                  .cta-button {
-                      display: inline-block;
-                      padding: 15px 25px;
-                      margin: 20px 0;
-                      background-color: #FF8318;
-                      color: #ffffff;
-                      font-weight: bold;
-                      text-decoration: none;
-                      border-radius: 5px;
-                      text-align: center;
-                  }
-                  .footer {
-                      text-align: center;
-                      padding: 10px 0;
-                      font-size: 12px;
-                      color: #777777;
-                  }
-              </style>
-          </head>
-          <body>
-              <div class="container">
-                  <div class="header">
-                      <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
-                          <rect width="100" height="100" fill="#007BFF"/>
-                          <h1>IA Lab.</h1>
-                      </svg>
-                  </div>
-                  <div class="content">
-                      <h3>Update your password</h3>
-                      <h5>Click the button below to update the password which was provided to you from admin section</h5>
-                      
-                      <a href="${resetLink}" class="cta-button">Update Password</a>
-                  </div>
-                  <div class="footer">
-                      <p>If you did not sign up for this account, please ignore this email.</p>
-                  </div>
-              </div>
-          </body>
-          </html>
-        `,
-      };
-      
-      try {
-        // Send the email asynchronously and await its result
-        const info = await mailSender.sendMail(details);
-        console.log("Email sent:", info.response);
-        return res.status(200).json({ message: ["Password reset email sent"] });
-      } catch (err) {
-        console.log("Error sending email:", err);
-        return res.status(500).json({ message: ["Error sending email"] });
-      }
-    };
-
-    // Call sendEmail asynchronously
-    await sendEmail();
+    // Send email asynchronously (background execution)
+    sendEmailResetForProfessor(user.email, resetLink).catch(console.error);
 
   } catch (err) {
-    if (err.name === "ValidationErrorItem") {
-      const validationErrors = err.errors.map((e) => e.message);
-      return res.status(400).json({ errors: [validationErrors.message] });
-    }
-    return res.status(500).json({ errors: [err.message] });
+    console.error("Error in ProfessorResetRequest:", err);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
 
 const ProfessorPasswordUpdate = async (req, res) => {
-  const { professorId	 } = req.params;
-  const { newPassword } = req.body;
-  const errors = [];
+  try {
+    const { professorId } = req.params;
+    const { newPassword } = req.body;
 
-  // Validate new password (as previously done)
-  if (!newPassword) {
-    errors.push("New password is required.");
-  } else {
+    // Validate professorId
+    const parsedProfessorId = parseInt(professorId, 10);
+    if (isNaN(parsedProfessorId)) {
+      return res.status(400).json({ error: "Invalid professor ID." });
+    }
+
+    // Validate new password
+    if (!newPassword) {
+      return res.status(400).json({ error: "New password is required." });
+    }
+
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{6,}$/;
     if (!passwordRegex.test(newPassword)) {
-      errors.push(
-        "Password must be at least 6 characters long and include one uppercase letter, one lowercase letter, one number, and one special character."
-      );
-    }
-  }
-
-  // If there are validation errors, respond with the errors
-  if (errors.length > 0) {
-    return res.status(400).json({ errors });
-  }
-
-  try {
-    // Find the user by ID
-    const user = await Professor.findByPk(professorId);
-
-    // Check if user exists
-    if (!user) {
-      return res.status(404).json({ errors: ["User not found."] });
+      return res.status(400).json({
+        error:
+          "Password must be at least 6 characters long and include one uppercase letter, one lowercase letter, one number, and one special character.",
+      });
     }
 
     // Hash the new password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    // Update user's password
-    user.password = hashedPassword;
+    // Update the professor's password directly
+    const [updatedRows] = await Professor.update(
+      { password: hashedPassword },
+      { where: { id: parsedProfessorId } } // Change "id" to "professorId" if your schema uses that
+    );
 
-    // Save the updated user to the database
-    await user.save();
-
-    // Respond with a success message
-    return res
-      .status(200)
-      .json({ message: ["Password updated successfully."] });
-  } catch (err) {
-    if (err.name === "ValidationErrorItem") {
-      const validationErrors = err.errors.map((e) => e.message);
-      return res.status(400).json({ errors: [validationErrors.message] });
+    // If no rows were updated, professor was not found
+    if (updatedRows === 0) {
+      return res.status(404).json({ error: "User not found." });
     }
-    return res.status(500).json({ errors: [err.message] });
+
+    return res.status(200).json({ message: "Password updated successfully." });
+
+  } catch (err) {
+    console.error("Error in ProfessorPasswordUpdate:", err);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
 
-const GetProfessorStudents = async (req,res)=>{
-      const {professorId}=req.params
 
-      try {
-        // Fetch all users from the database, excluding sensitive fields like password
-        const AllProfessorsStudents = await User.findAll({
-          where: { guideId: professorId },
-          attributes: { exclude: ['password'] }
-        });
-        
-        // Respond with an empty array if no users are found, but still return 200 OK
-        if (AllProfessorsStudents.length === 0) {
-          return res.status(200).json({ message: ["No Student list to show"] });
-        }
-    
-        // Respond with the list of users
-        return res.status(200).json({ AllProfessorsStudents });
-      } catch (err) {
-        if (err.name === "ValidationErrorItem") {
-          const validationErrors = err.errors.map((e) => e.message);
-          return res.status(400).json({ errors: [validationErrors.message] });
-        }
-        return res.status(500).json({ errors: [err.message] });
-      }
-}
+const GetProfessorStudents = async (req, res) => {
+  try {
+    const { professorId } = req.params;
+
+    // Validate professorId (ensure it's provided and is a number)
+    if (!professorId) {
+      return res.status(400).json({ error: "Professor ID is required." });
+    }
+
+    // const parsedProfessorId = parseInt(professorId.trim(), 10);
+    // if (isNaN(parsedProfessorId)) {
+    //   return res.status(400).json({ error: "Invalid professor ID." });
+    // }
+
+    // console.log(parsedProfessorId)
+    // Fetch students assigned to the professor
+    const students = await User.findAll({
+      where: { guideId: professorId },
+      attributes: { exclude: ["password"] }, // Ensure passwords are never exposed
+    });
+console.log(students)
+    return res.status(200).json({ students });
+
+  } catch (err) {
+    console.error(`Error in GetProfessorStudents (Professor ID: ${req.params.professorId}):`, err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 
 const deleteProfessorStudents = async(req, res) => {
   const { studentId } = req.params;
@@ -768,35 +470,33 @@ const deleteProfessorStudents = async(req, res) => {
   }
 };
 
-const viewStudentBooking = async (req, res) => {
-  const { userId, guideId } = req.params;
 
+
+
+const viewStudentBooking = async (req, res) => {
   try {
-    // Fetch the booking history of the student, including the related equipment details
+    const { userId, guideId } = req.params;
+console.log(userId , "and" ,guideId)
     const bookingHistoryOfStudent = await Booking.findAll({
-      where: { guideId, userId },
+      where: { userId: userId, guideId: guideId }, // Remove guideId if unnecessary
       include: {
         model: Equipment,
-        attributes: ['equipmentName'], // Only include the equipmentName from the Equipment table
+        attributes: ["equipmentName"], // Fetch only equipment name
       },
-      attributes: ['bookingId', 'bookedDate', 'slotTime', 'slotDate', 'bookingStatus'], // Only include the necessary fields from Booking
+      attributes: ["bookingId", "bookedDate", "slotTime", "slotDate", "bookingStatus"], // Fetch only necessary fields
     });
+console.log(bookingHistoryOfStudent)
+    // Return the result (empty array if no records found)
+    return res.status(200).json({ bookingHistory: bookingHistoryOfStudent });
 
-    // Respond with an empty array if no bookings are found, but still return 200 OK
-    if (bookingHistoryOfStudent.length === 0) {
-      return res.status(200).json({ message: ["No booking history found."] });
-    }
-
-    // Respond with the booking history along with the equipment name
-    return res.status(200).json({ bookingHistoryOfStudent });
   } catch (err) {
-    if (err.name === "ValidationErrorItem") {
-      const validationErrors = err.errors.map((e) => e.message);
-      return res.status(400).json({ errors: [validationErrors.message] });
-    }
-    return res.status(500).json({ errors: [err.message] });
+    console.error("Error in viewStudentBooking:", err);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
+
 
 module.exports = {
     allProfessorsFinder,createProfessorProfile,deleteProfessor,ProfessorLogin,ProfessorResetRequest,ProfessorPasswordUpdate,GetProfessorStudents,deleteProfessorStudents,viewStudentBooking
