@@ -849,315 +849,535 @@ const nodemailer = require("nodemailer");
 const { Op } = require('sequelize');
 
 // const {html}=mjml2html(mjml)
+// const createUser1 = async (req, res) => {
+//   const {
+//     firstName,
+//     lastName,
+//     email,
+//     instituteId,
+//     guideId,
+//     mobileNumber,
+//     password,
+//   } = req.body;
+
+//   const errors = [];
+
+//   // Helper function for input validation
+//   const validateInputs = () => {
+//     const trimmedFirstName = firstName ? firstName.trim() : "";
+//     const trimmedLastName = lastName ? lastName.trim() : "";
+//     const trimmedEmail = email ? email.trim() : "";
+//     const trimmedInstituteID = instituteId ? instituteId.trim() : "";
+//     const trimmedGuideId= guideId ? guideId.trim() : "";
+//     const trimmedMobileNumber = mobileNumber? mobileNumber.trim():""
+//     const trimmedPassword = password ? password.trim() : "";
+//     // Check for missing fields
+//     if (
+//       !trimmedFirstName ||
+//       !trimmedLastName ||
+//       !trimmedEmail ||
+//       !trimmedInstituteID ||
+//       !trimmedGuideId ||
+//       !trimmedMobileNumber ||
+//       !trimmedPassword
+//     ) {
+//       errors.push("All fields are required.");
+//     }
+
+//     // Validate firstname (letters only)
+//     if (!/^[A-Za-z]+$/.test(trimmedFirstName)) {
+//       errors.push("First name must contain letters only.");
+//     }
+
+//     // Validate lastname (letters only)
+//     if (!/^[A-Za-z]+$/.test(trimmedLastName)) {
+//       errors.push("Last name must contain letters only.");
+//     }
+
+//     if (!/^\d+$/.test(trimmedInstituteID)) {
+//       errors.push("Institute ID must contain numbers only.");
+//     }
+    
+//     if (!/^\+91\d{10}$/.test(trimmedMobileNumber)) {
+//       errors.push("Contact number must start with +91 and contain 12 digits in total (excluding +).");
+//     }
+    
+
+//     // Validate email format
+// const emailRegex = /^[^\s@]+@ch\.iitr\.ac\.in$/;
+
+// if (!emailRegex.test(trimmedEmail)) {
+//   errors.push("Invalid email ID");
+// }
+
+
+//     // Validate password complexity
+//     const passwordRegex =
+//       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{6,}$/;
+//     if (!passwordRegex.test(trimmedPassword)) {
+//       errors.push(
+//         "Password must be at least 6 characters long and include one uppercase letter, one lowercase letter, one number, and one special character."
+//       );
+//     }
+//   };
+
+//   // Run validation
+//   validateInputs();
+
+//   // Check if there are any errors
+//   if (errors.length > 0) {
+//     return res.status(400).json({ errors: errors });
+//   }
+
+//   try {
+//     // Hash the password
+//     const salt = await bcrypt.genSalt(10);
+//     const hashPassword = await bcrypt.hash(password, salt);
+
+//     // Create the user
+//     const emailTrimmed = email.trim().toLowerCase()
+//     const userEmail = await User.findOne({
+//       where: { email: emailTrimmed },
+//     });
+//   let userEmailChecker = userEmail?.email || ""
+//      if(!userEmailChecker){
+//       const user = await User.create({
+//         firstName: firstName.trim(),
+//         lastName: lastName.trim(),
+//         instituteId: instituteId.trim(),
+//         guideId: guideId.trim(),
+//         email: emailTrimmed,
+//         mobileNumber: mobileNumber.trim(),
+//         password: hashPassword,
+//     });
+
+//     const guideEmail = await Professor.findOne({
+//       where: { professorId: guideId },
+//       attributes: ['email'],
+//     });
+//  let guideEmailAddress = guideEmail.email
+// // Create a password reset link
+// const resetLink = `${process.env.FRONTEND_URL}studentConfirmation/${user.userId}`
+
+
+// // Send email asynchronously
+// const sendEmail = async () => {
+//   const mailSender = nodemailer.createTransport({
+//     service: "gmail",
+//     port: 465,
+//     secure: true, 
+//     auth: {
+//       user: process.env.EMAIL_USER,
+//       pass: process.env.EMAIL_PASS,
+//     },
+//     tls: {
+//       rejectUnauthorized: false, 
+//     },
+//   });
+  
+
+
+//   const details = {
+//     from: process.env.EMAIL_USER,
+//     to: guideEmailAddress,
+//     subject: `${user.firstName} is requesting to access IA lab booking portal`,
+//     html: `
+//       <!DOCTYPE html>
+//       <html lang="en">
+//       <head>
+//           <meta charset="UTF-8">
+//           <meta name="viewport" content="width=device-width, initial-scale=1.0">
+//           <title>Confirm Student</title>
+//           <style>
+//               body {
+//                   font-family: Arial, sans-serif;
+//                   background-color: #f6f6f6;
+//                   margin: 0;
+//                   padding: 0;
+//               }
+//               .container {
+//                   max-width: 600px;
+//                   margin: 0 auto;
+//                   background-color: #ffffff;
+//                   padding: 20px;
+//                   border-radius: 8px;
+//                   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+//                   border: 1px solid #cccccc;
+//               }
+//               .header {
+//                   text-align: center;
+//                   padding: 10px 0;
+//               }
+//               .content {
+//                   text-align: center;
+//                   padding: 20px;
+//               }
+//               .cta-button {
+//                   display: inline-block;
+//                   padding: 15px 25px;
+//                   margin: 20px 0;
+//                   background-color: #FF8318;
+//                   color: #ffffff;
+//                   font-weight: bold;
+//                   text-decoration: none;
+//                   border-radius: 5px;
+//                   text-align: center;
+//               }
+//               .footer {
+//                   text-align: center;
+//                   padding: 10px 0;
+//                   font-size: 12px;
+//                   color: #777777;
+//               }
+//           </style>
+//       </head>
+//       <body>
+//           <div class="container">
+//               <div class="header">
+//                   <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+//                       <rect width="100" height="100" fill="#007BFF"/>
+//                       <h1>IA Lab.</h1>
+//                   </svg>
+//               </div>
+//               <div class="content">
+//                   <h3>Confirm student</h3>
+//                   <h5>By clicking the button below, you are confirming that the student is working under your supervision and granting permission for the use of equipment in the IA lab. Additionally, you will have access to view the equipment utilized by your students through the IA Lab Professors Portal.</h5>
+//                   <a href="${resetLink}" class="cta-button">Confirm Access to ${user.firstName}</a>
+//               </div>
+//               <div class="footer">
+//                   <p>If you did not sign up for this account, please ignore this email.</p>
+//               </div>
+//           </div>
+//       </body>
+//       </html>
+//     `,
+//   };
+  
+//   try {
+//     // Send the email asynchronously and await its result
+//     const info = await mailSender.sendMail(details);
+//     console.log("Email sent:", info.response);
+//     return res.status(200).json({ message: ["Password reset email sent"] });
+//   } catch (err) {
+//     console.log("Error sending email:", err);
+//     return res.status(500).json({ message: ["Error sending email"] });
+//   }
+// };
+
+// // Call sendEmail asynchronously
+// await sendEmail();
+//     // Generate JWT token
+//      }else{
+//       return res.status(400).json({ errors: "User already exist"});
+//      }
+
+//     // const token = jwt.sign(
+//     //   {
+//     //     userId: user.userId,
+//     //     userName: user.firstName,
+//     //     userEmail:user.email,
+//     //     userRole: user.role,
+//     //     verification:user.verification,
+//     //     userGuidEmail : guideEmail.email
+//     //   },
+//     //   process.env.JWT_SECRET_KEY,
+//     //   { expiresIn: "3d" }
+//     // );
+
+//     // res.setHeader("Authorization", `Bearer ${token}`);
+//     // return res.status(200).json({
+//     //   message: ["User created successfully"],
+//     // });
+
+//   } catch (err) {
+//     if (err.name === "ValidationErrorItem") {
+//       const validationErrors = err.errors.map((e) => e.message);
+//       return res.status(400).json({ errors: [validationErrors.message] });
+//     }
+
+//     return res.status(500).json({ errors: [err.message] });
+//   }
+// };
 const createUser = async (req, res) => {
-  const {
-    firstName,
-    lastName,
-    email,
-    instituteId,
-    guideId,
-    mobileNumber,
-    password,
-  } = req.body;
+  const { firstName, lastName, email, instituteId, guideId, mobileNumber, password } = req.body;
+  
+  // Trim inputs once
+  const trimmedData = {
+    firstName: firstName?.trim() || "",
+    lastName: lastName?.trim() || "",
+    email: email?.trim().toLowerCase() || "",
+    instituteId: instituteId?.trim() || "",
+    guideId: guideId?.trim() || "",
+    mobileNumber: mobileNumber?.trim() || "",
+    password: password?.trim() || "",
+  };
 
   const errors = [];
 
-  // Helper function for input validation
+  // Validate inputs
   const validateInputs = () => {
-    const trimmedFirstName = firstName ? firstName.trim() : "";
-    const trimmedLastName = lastName ? lastName.trim() : "";
-    const trimmedEmail = email ? email.trim() : "";
-    const trimmedInstituteID = instituteId ? instituteId.trim() : "";
-    const trimmedGuideId= guideId ? guideId.trim() : "";
-    const trimmedMobileNumber = mobileNumber? mobileNumber.trim():""
-    const trimmedPassword = password ? password.trim() : "";
-    // Check for missing fields
-    if (
-      !trimmedFirstName ||
-      !trimmedLastName ||
-      !trimmedEmail ||
-      !trimmedInstituteID ||
-      !trimmedGuideId ||
-      !trimmedMobileNumber ||
-      !trimmedPassword
-    ) {
+    const { firstName, lastName, email, instituteId, guideId, mobileNumber, password } = trimmedData;
+
+    if (!firstName || !lastName || !email || !instituteId || !guideId || !mobileNumber || !password) {
       errors.push("All fields are required.");
     }
 
-    // Validate firstname (letters only)
-    if (!/^[A-Za-z]+$/.test(trimmedFirstName)) {
-      errors.push("First name must contain letters only.");
-    }
-
-    // Validate lastname (letters only)
-    if (!/^[A-Za-z]+$/.test(trimmedLastName)) {
-      errors.push("Last name must contain letters only.");
-    }
-
-    if (!/^\d+$/.test(trimmedInstituteID)) {
-      errors.push("Institute ID must contain numbers only.");
-    }
-    
-    if (!/^\+91\d{10}$/.test(trimmedMobileNumber)) {
-      errors.push("Contact number must start with +91 and contain 12 digits in total (excluding +).");
-    }
-    
-
-    // Validate email format
-const emailRegex = /^[^\s@]+@ch\.iitr\.ac\.in$/;
-
-if (!emailRegex.test(trimmedEmail)) {
-  errors.push("Invalid email ID");
-}
-
-
-    // Validate password complexity
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{6,}$/;
-    if (!passwordRegex.test(trimmedPassword)) {
-      errors.push(
-        "Password must be at least 6 characters long and include one uppercase letter, one lowercase letter, one number, and one special character."
-      );
+    if (!/^[A-Za-z]+$/.test(firstName)) errors.push("First name must contain letters only.");
+    if (!/^[A-Za-z]+$/.test(lastName)) errors.push("Last name must contain letters only.");
+    if (!/^\d+$/.test(instituteId)) errors.push("Institute ID must contain numbers only.");
+    if (!/^\+91\d{10}$/.test(mobileNumber)) errors.push("Contact number must start with +91 and contain 12 digits in total (excluding +).");
+    if (!/^[^\s@]+@ch\.iitr\.ac\.in$/.test(email)) errors.push("Invalid email ID.");
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{6,}$/.test(password)) {
+      errors.push("Password must be at least 6 characters long and include one uppercase letter, one lowercase letter, one number, and one special character.");
     }
   };
 
-  // Run validation
   validateInputs();
-
-  // Check if there are any errors
-  if (errors.length > 0) {
-    return res.status(400).json({ errors: errors });
-  }
+  if (errors.length) return res.status(400).json({ errors });
 
   try {
-    // Hash the password
-    const salt = await bcrypt.genSalt(10);
-    const hashPassword = await bcrypt.hash(password, salt);
+    // Perform hashing and database checks in parallel
+    const [hashedPassword, existingUser] = await Promise.all([
+      bcrypt.hash(trimmedData.password, 10),
+      User.findOne({ where: { email: trimmedData.email } })
+    ]);
 
-    // Create the user
-    const emailTrimmed = email.trim().toLowerCase()
-    const userEmail = await User.findOne({
-      where: { email: emailTrimmed },
-    });
-  let userEmailChecker = userEmail?.email || ""
-     if(!userEmailChecker){
-      const user = await User.create({
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        instituteId: instituteId.trim(),
-        guideId: guideId.trim(),
-        email: emailTrimmed,
-        mobileNumber: mobileNumber.trim(),
-        password: hashPassword,
-    });
+    if (existingUser) return res.status(400).json({ errors: ["User already exists."] });
 
-    const guideEmail = await Professor.findOne({
-      where: { professorId: guideId },
-      attributes: ['email'],
-    });
- let guideEmailAddress = guideEmail.email
-// Create a password reset link
-const resetLink = `${process.env.FRONTEND_URL}studentConfirmation/${user.userId}`
+    // Create user and fetch guide email in parallel
+    const [user, guide] = await Promise.all([
+      User.create({ ...trimmedData, password: hashedPassword }),
+      Professor.findOne({ where: { professorId: trimmedData.guideId }, attributes: ["email"] })
+    ]);
 
+    const guideEmail = guide?.email;
+    if (!guideEmail) return res.status(400).json({ errors: ["Guide email not found."] });
 
-// Send email asynchronously
-const sendEmail = async () => {
-  const mailSender = nodemailer.createTransport({
-    service: "gmail",
-    port: 465,
-    secure: true, 
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-    tls: {
-      rejectUnauthorized: false, 
-    },
-  });
-  
+    // Send email asynchronously to improve response speed
+    (async () => {
+      try {
+        const mailSender = nodemailer.createTransport({
+          service: "gmail",
+          port: 465,
+          secure: true,
+          auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+          tls: { rejectUnauthorized: false }
+        });
 
-
-  const details = {
-    from: process.env.EMAIL_USER,
-    to: guideEmailAddress,
-    subject: `${user.firstName} is requesting to access IA lab booking portal`,
-    html: `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Confirm Student</title>
-          <style>
-              body {
-                  font-family: Arial, sans-serif;
-                  background-color: #f6f6f6;
-                  margin: 0;
-                  padding: 0;
-              }
-              .container {
-                  max-width: 600px;
-                  margin: 0 auto;
-                  background-color: #ffffff;
-                  padding: 20px;
-                  border-radius: 8px;
-                  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                  border: 1px solid #cccccc;
-              }
-              .header {
-                  text-align: center;
-                  padding: 10px 0;
-              }
-              .content {
-                  text-align: center;
-                  padding: 20px;
-              }
-              .cta-button {
-                  display: inline-block;
-                  padding: 15px 25px;
-                  margin: 20px 0;
-                  background-color: #FF8318;
-                  color: #ffffff;
-                  font-weight: bold;
-                  text-decoration: none;
-                  border-radius: 5px;
-                  text-align: center;
-              }
-              .footer {
-                  text-align: center;
-                  padding: 10px 0;
-                  font-size: 12px;
-                  color: #777777;
-              }
-          </style>
-      </head>
-      <body>
-          <div class="container">
-              <div class="header">
-                  <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
-                      <rect width="100" height="100" fill="#007BFF"/>
-                      <h1>IA Lab.</h1>
-                  </svg>
+        const resetLink = `${process.env.FRONTEND_URL}studentConfirmation/${user.userId}`;
+        const emailDetails = {
+          from: process.env.EMAIL_USER,
+          to: guideEmail,
+          subject: `${user.firstName} is requesting to access IA lab booking portal`,
+          html: `
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Confirm Student</title>
+              <style>
+                  body {
+                      font-family: Arial, sans-serif;
+                      background-color: #f6f6f6;
+                      margin: 0;
+                      padding: 0;
+                  }
+                  .container {
+                      max-width: 600px;
+                      margin: 0 auto;
+                      background-color: #ffffff;
+                      padding: 20px;
+                      border-radius: 8px;
+                      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                      border: 1px solid #cccccc;
+                  }
+                  .header {
+                      text-align: center;
+                      padding: 10px 0;
+                  }
+                  .content {
+                      text-align: center;
+                      padding: 20px;
+                  }
+                  .cta-button {
+                      display: inline-block;
+                      padding: 15px 25px;
+                      margin: 20px 0;
+                      background-color: #FF8318;
+                      color: #ffffff;
+                      font-weight: bold;
+                      text-decoration: none;
+                      border-radius: 5px;
+                      text-align: center;
+                  }
+                  .footer {
+                      text-align: center;
+                      padding: 10px 0;
+                      font-size: 12px;
+                      color: #777777;
+                  }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <div class="header">
+                      <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                          <rect width="100" height="100" fill="#007BFF"/>
+                          <h1>IA Lab.</h1>
+                      </svg>
+                  </div>
+                  <div class="content">
+                      <h3>Confirm student</h3>
+                      <h5>By clicking the button below, you are confirming that the student is working under your supervision and granting permission for the use of equipment in the IA lab. Additionally, you will have access to view the equipment utilized by your students through the IA Lab Professors Portal.</h5>
+                      <a href="${resetLink}" class="cta-button">Confirm Access to ${user.firstName}</a>
+                  </div>
+                  <div class="footer">
+                      <p>If you did not sign up for this account, please ignore this email.</p>
+                  </div>
               </div>
-              <div class="content">
-                  <h3>Confirm student</h3>
-                  <h5>By clicking the button below, you are confirming that the student is working under your supervision and granting permission for the use of equipment in the IA lab. Additionally, you will have access to view the equipment utilized by your students through the IA Lab Professors Portal.</h5>
-                  <a href="${resetLink}" class="cta-button">Confirm Access to ${user.firstName}</a>
-              </div>
-              <div class="footer">
-                  <p>If you did not sign up for this account, please ignore this email.</p>
-              </div>
-          </div>
-      </body>
-      </html>
-    `,
-  };
-  
-  try {
-    // Send the email asynchronously and await its result
-    const info = await mailSender.sendMail(details);
-    console.log("Email sent:", info.response);
-    return res.status(200).json({ message: ["Password reset email sent"] });
-  } catch (err) {
-    console.log("Error sending email:", err);
-    return res.status(500).json({ message: ["Error sending email"] });
+          </body>
+          </html>
+        `,
+        };
+
+        await mailSender.sendMail(emailDetails);
+        console.log("Confirmation email sent to guide.");
+      } catch (error) {
+        console.error("Error sending email:", error);
+      }
+    })();
+
+    return res.status(200).json({ message: ["User created successfully. Confirmation email sent to guide."] });
+  } catch (error) {
+    return res.status(500).json({ errors: [error.message] });
   }
 };
 
-// Call sendEmail asynchronously
-await sendEmail();
-    // Generate JWT token
-     }else{
-      return res.status(400).json({ errors: "User already exist"});
-     }
+// const userLogIn = async (req, res) => {
+//   const { email, password } = req.body;
 
-    // const token = jwt.sign(
-    //   {
-    //     userId: user.userId,
-    //     userName: user.firstName,
-    //     userEmail:user.email,
-    //     userRole: user.role,
-    //     verification:user.verification,
-    //     userGuidEmail : guideEmail.email
-    //   },
-    //   process.env.JWT_SECRET_KEY,
-    //   { expiresIn: "3d" }
-    // );
+//   const errors = [];
 
-    // res.setHeader("Authorization", `Bearer ${token}`);
-    // return res.status(200).json({
-    //   message: ["User created successfully"],
-    // });
+//   // Trim input values
+//   const trimmedEmail = email ? email.trim() : "";
+//   const trimmedPassword = password ? password.trim() : "";
 
-  } catch (err) {
-    if (err.name === "ValidationErrorItem") {
-      const validationErrors = err.errors.map((e) => e.message);
-      return res.status(400).json({ errors: [validationErrors.message] });
-    }
+//   // Validation checks
+//   if (!trimmedEmail) errors.push("Email is required.");
+//   if (!trimmedPassword) errors.push("Password is required.");
 
-    return res.status(500).json({ errors: [err.message] });
-  }
-};
+//   // If there are validation errors, respond with the errors
+//   if (errors.length > 0) {
+//     return res.status(400).json({ errors });
+//   }
 
+//   try {
+//     // Find the user by email
+//     const user = await User.findOne({ where: { email: trimmedEmail } });
+//     // Check if user exists
+//     if (!user) {
+//       return res.status(401).json({ errors: ["Invalid credentials"] });
+//     }
+
+//     // Check if the password matches
+//     const isMatch = await bcrypt.compare(trimmedPassword, user.password);
+//     if (!isMatch) {
+//       return res.status(401).json({ errors: ["Invalid credentials"] });
+//     }
+//     if(!user.verification){
+//       return res.status(401).json({ errors: ["You're not verified yet. Please ask your guide to respond to the confirmation email that was already sent."] });
+//     }
+
+//     // Generate JWT token
+//     const token = jwt.sign(
+//       {
+//         userId: user.userId,
+//         userName: user.firstName,
+//         userEmail:user.email,
+//         userRole: user.role,
+//         verification: user.verification
+//       },
+//       process.env.JWT_SECRET_KEY,
+//       { expiresIn: "3d" }
+//     );
+
+//     // Send response with token
+//     res.setHeader("Authorization", `Bearer ${token}`);
+//     return res.status(200).json({
+//       message: ["User logged in successfully"],
+//     });
+//   } catch (err) {
+//     if (err.name === "ValidationErrorItem") {
+//       const validationErrors = err.errors.map((e) => e.message);
+//       return res.status(400).json({ errors: [validationErrors.message] });
+//     }
+
+//     return res.status(500).json({ errors: [err.message] });
+//   }
+// };
 const userLogIn = async (req, res) => {
   const { email, password } = req.body;
 
-  const errors = [];
+  // Trim and validate input values
+  const trimmedEmail = email?.trim() || "";
+  const trimmedPassword = password?.trim() || "";
 
-  // Trim input values
-  const trimmedEmail = email ? email.trim() : "";
-  const trimmedPassword = password ? password.trim() : "";
+  // Initialize an empty errors array
+  const errors = [];
 
   // Validation checks
   if (!trimmedEmail) errors.push("Email is required.");
   if (!trimmedPassword) errors.push("Password is required.");
 
-  // If there are validation errors, respond with the errors
+  // If validation fails, return early with errors
   if (errors.length > 0) {
     return res.status(400).json({ errors });
   }
 
   try {
-    // Find the user by email
+    // Fetch user by email
     const user = await User.findOne({ where: { email: trimmedEmail } });
-    // Check if user exists
+
+    // If user doesn't exist, return an error
     if (!user) {
       return res.status(401).json({ errors: ["Invalid credentials"] });
     }
 
-    // Check if the password matches
+    // Compare passwords using bcrypt
     const isMatch = await bcrypt.compare(trimmedPassword, user.password);
+
+    // If password doesn't match, return an error
     if (!isMatch) {
       return res.status(401).json({ errors: ["Invalid credentials"] });
     }
-    if(!user.verification){
-      return res.status(401).json({ errors: ["You're not verified yet. Please ask your guide to respond to the confirmation email that was already sent."] });
+
+    // Check if user is verified
+    if (!user.verification) {
+      return res.status(401).json({ errors: ["You're not verified yet. Please ask your guide to respond to the confirmation email."] });
     }
 
-    // Generate JWT token
+    // Generate JWT token with user details
     const token = jwt.sign(
       {
         userId: user.userId,
         userName: user.firstName,
-        userEmail:user.email,
+        userEmail: user.email,
         userRole: user.role,
-        verification: user.verification
+        verification: user.verification,
       },
       process.env.JWT_SECRET_KEY,
       { expiresIn: "3d" }
     );
 
-    // Send response with token
+    // Send token in the response header
     res.setHeader("Authorization", `Bearer ${token}`);
+
     return res.status(200).json({
       message: ["User logged in successfully"],
     });
   } catch (err) {
-    if (err.name === "ValidationErrorItem") {
-      const validationErrors = err.errors.map((e) => e.message);
-      return res.status(400).json({ errors: [validationErrors.message] });
-    }
-
+    // Error handling for validation or internal errors
     return res.status(500).json({ errors: [err.message] });
   }
 };
@@ -1396,52 +1616,186 @@ const allUserFinder = async (req, res) => {
 };
 
 
+// const userPasswordResetRequest2 = async (req, res) => {
+//   const { email } = req.body;
+//   const errors = [];
+
+
+//   // Validation checks
+//   if (!email) {
+//     errors.push("Email is required.");
+//   }
+
+//   // If there are validation errors, respond with the errors
+//   if (errors.length > 0) {
+//     return res.status(400).json({ errors });
+//   }
+
+//   try {
+//     // Find the user by email
+//     const user = await User.findOne({ where: { email } });
+
+//     // Check if user exists
+//     if (!user) {
+//       return res
+//         .status(404)
+//         .json({ message: ["Update link has been sent to your email"] });
+//     }
+
+//     // Create a password reset link
+//     const resetLink = `${process.env.FRONTEND_URL}/userPasswordReset/${user.userId}`
+
+
+//     // Send email asynchronously
+//     const sendEmail = async () => {
+//       let mailSender = nodemailer.createTransport({
+//         service: "gmail",
+//         port: 465,
+//         auth: {
+//           user: process.env.EMAIL_USER,
+//           pass: process.env.EMAIL_PASS,
+//         },
+//       });
+
+//       const details = {
+//         from: process.env.EMAIL_USER,
+//         to: user.email,
+//         subject: "Password Reset Request",
+//         html: `
+//           <!DOCTYPE html>
+//           <html lang="en">
+//           <head>
+//               <meta charset="UTF-8">
+//               <meta name="viewport" content="width=device-width, initial-scale=1.0">
+//               <title>Update Password</title>
+//               <style>
+//                   body {
+//                       font-family: Arial, sans-serif;
+//                       background-color: #f6f6f6;
+//                       margin: 0;
+//                       padding: 0;
+//                   }
+//                   .container {
+//                       max-width: 600px;
+//                       margin: 0 auto;
+//                       background-color: #ffffff;
+//                       padding: 20px;
+//                       border-radius: 8px;
+//                       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+//                       border: 1px solid #cccccc;
+//                   }
+//                   .header {
+//                       text-align: center;
+//                       padding: 10px 0;
+//                   }
+//                   .content {
+//                       text-align: center;
+//                       padding: 20px;
+//                   }
+//                   .cta-button {
+//                       display: inline-block;
+//                       padding: 15px 25px;
+//                       margin: 20px 0;
+//                       background-color: #FF8318;
+//                       color: #ffffff;
+//                       font-weight: bold;
+//                       text-decoration: none;
+//                       border-radius: 5px;
+//                       text-align: center;
+//                   }
+//                   .footer {
+//                       text-align: center;
+//                       padding: 10px 0;
+//                       font-size: 12px;
+//                       color: #777777;
+//                   }
+//               </style>
+//           </head>
+//           <body>
+//               <div class="container">
+//                   <div class="header">
+//                       <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+//                           <rect width="100" height="100" fill="#007BFF"/>
+//                           <h1>IA Lab.</h1>
+//                       </svg>
+//                   </div>
+//                   <div class="content">
+//                       <h3>Update your password</h3>
+//                       <h5>Click the button below to update your password.</h5>
+                      
+//                       <a href="${resetLink}" class="cta-button">Update Password</a>
+//                   </div>
+//                   <div class="footer">
+//                       <p>If you did not sign up for this account, please ignore this email.</p>
+//                   </div>
+//               </div>
+//           </body>
+//           </html>
+//         `,
+//       };
+      
+//       try {
+//         // Send the email asynchronously and await its result
+//         const info = await mailSender.sendMail(details);
+//         console.log("Email sent:", info.response);
+//         return res.status(200).json({ message: ["Password reset email sent"] });
+//       } catch (err) {
+//         console.log("Error sending email:", err);
+//         return res.status(500).json({ message: ["Error sending email"] });
+//       }
+//     };
+
+//     // Call sendEmail asynchronously
+//     await sendEmail();
+
+//   } catch (err) {
+//     if (err.name === "ValidationErrorItem") {
+//       const validationErrors = err.errors.map((e) => e.message);
+//       return res.status(400).json({ errors: [validationErrors.message] });
+//     }
+//     return res.status(500).json({ errors: [err.message] });
+//   }
+// };
+
 const userPasswordResetRequest = async (req, res) => {
   const { email } = req.body;
-  const errors = [];
+  const trimmedEmail = email?.trim() || "";
 
-
-  // Validation checks
-  if (!email) {
-    errors.push("Email is required.");
-  }
-
-  // If there are validation errors, respond with the errors
-  if (errors.length > 0) {
-    return res.status(400).json({ errors });
+  if (!trimmedEmail) {
+    return res.status(400).json({ errors: ["Email is required."] });
   }
 
   try {
-    // Find the user by email
-    const user = await User.findOne({ where: { email } });
+    // Find user by email
+    const user = await User.findOne({ where: { email: trimmedEmail } });
 
-    // Check if user exists
-    if (!user) {
-      return res
-        .status(404)
-        .json({ message: ["Update link has been sent to your email"] });
-    }
+    // Always return success message, even if user does not exist (to prevent email enumeration attacks)
+    res.status(200).json({ message: ["A reset link has been sent to your email."] });
 
-    // Create a password reset link
-    const resetLink = `${process.env.FRONTEND_URL}/userPasswordReset/${user.userId}`
+    if (!user) return; // Stop further execution if user does not exist
 
+    // Generate password reset link
+    const resetLink = `${process.env.FRONTEND_URL}/userPasswordReset/${user.userId}`;
 
-    // Send email asynchronously
-    const sendEmail = async () => {
-      let mailSender = nodemailer.createTransport({
-        service: "gmail",
-        port: 465,
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
-      });
+    // Send email asynchronously without delaying response
+    (async () => {
+      try {
+        const mailSender = nodemailer.createTransport({
+          service: "gmail",
+          port: 465,
+          secure: true,
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+          },
+          tls: { rejectUnauthorized: false },
+        });
 
-      const details = {
-        from: process.env.EMAIL_USER,
-        to: user.email,
-        subject: "Password Reset Request",
-        html: `
+        const emailDetails = {
+          from: process.env.EMAIL_USER,
+          to: user.email,
+          subject: "Password Reset Request",
+          html: `
           <!DOCTYPE html>
           <html lang="en">
           <head>
@@ -1512,31 +1866,18 @@ const userPasswordResetRequest = async (req, res) => {
           </body>
           </html>
         `,
-      };
-      
-      try {
-        // Send the email asynchronously and await its result
-        const info = await mailSender.sendMail(details);
-        console.log("Email sent:", info.response);
-        return res.status(200).json({ message: ["Password reset email sent"] });
+        };
+
+        await mailSender.sendMail(emailDetails);
+        console.log("Password reset email sent successfully.");
       } catch (err) {
-        console.log("Error sending email:", err);
-        return res.status(500).json({ message: ["Error sending email"] });
+        console.error("Error sending password reset email:", err);
       }
-    };
-
-    // Call sendEmail asynchronously
-    await sendEmail();
-
+    })();
   } catch (err) {
-    if (err.name === "ValidationErrorItem") {
-      const validationErrors = err.errors.map((e) => e.message);
-      return res.status(400).json({ errors: [validationErrors.message] });
-    }
     return res.status(500).json({ errors: [err.message] });
   }
 };
-
 
 const userPasswordUpdate = async (req, res) => {
   const { userId } = req.params;
