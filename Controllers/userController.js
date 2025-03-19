@@ -282,10 +282,9 @@ const createUser = async (req, res) => {
     if (!/^[A-Za-z]+$/.test(lastName)) errors.push("Last name must contain letters only.");
     if (!/^\d+$/.test(instituteId)) errors.push("Institute ID must contain numbers only.");
     if (!/^\+91\d{10}$/.test(mobileNumber)) errors.push("Contact number must start with +91 and contain 12 digits in total (excluding +).");
-    if (!/^[^\s@]+@(ch\.iitr\.ac\.in|mch@iitr\.ac\.in)$/.test(email)) {
+    if (!/^[^\s@]+@(ch\.iitr\.ac\.in|mch\.iitr\.ac\.in)$/.test(email)) {
       errors.push("Invalid email ID.");
-  }
-  
+  }  
     if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{6,}$/.test(password)) {
       errors.push("Password must be at least 6 characters long and include one uppercase letter, one lowercase letter, one number, and one special character.");
     }
